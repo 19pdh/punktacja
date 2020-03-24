@@ -75,7 +75,7 @@ export default {
     this.getPoints();
   },
   watch: {
-    r(p, n) {
+    r() {
       this.getPoints();
     },
   },
