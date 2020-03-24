@@ -42,6 +42,7 @@ export default {
       localStorage.setItem('password', this.password);
       console.log(this.password);
       this.dialog = false;
+      this.$emit('change');
     },
   },
 };

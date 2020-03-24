@@ -13,9 +13,9 @@
       </v-btn>
     </v-app-bar>
 
-    <v-content>
-      <GetPassword />
-      <Punktacja />
+    <v-content class="content">
+      <GetPassword @change="reload" />
+      <Punktacja :r="r" />
     </v-content>
   </v-app>
 </template>
@@ -33,7 +33,19 @@ export default {
   },
 
   data: () => ({
-    //
+    r: 0,
   }),
+
+  methods: {
+    reload() {
+      this.r = Math.random();
+    },
+  },
 };
 </script>
+
+<style scoped>
+.content {
+  margin: 30px 0;
+}
+</style>

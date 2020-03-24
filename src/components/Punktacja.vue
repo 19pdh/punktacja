@@ -2,11 +2,7 @@
   <div>
     <v-data-table :headers="headers" :items="points">
       <template v-slot:item.points="props">
-        <v-edit-dialog
-          :return-value.sync="props.item.points"
-          @save="save"
-          @cancel="cancel"
-        >
+        <v-edit-dialog :return-value.sync="props.item.points" @save="save">
           {{ props.item.points }}
           <template v-slot:input>
             <v-text-field
@@ -52,6 +48,9 @@ const getQuery = `
 const URL = 'https://graphql.fauna.com/graphql';
 
 export default {
+  props: {
+    r: Number,
+  },
   data() {
     return {
       snack: false,
@@ -75,6 +74,11 @@ export default {
   mounted() {
     this.getPoints();
   },
+  watch: {
+    r(p, n) {
+      this.getPoints();
+    },
+  },
   methods: {
     success() {
       this.snack = true;
@@ -95,21 +99,25 @@ export default {
       console.log('Dialog closed');
     },
     async getPoints() {
-      const token = parseToken(localStorage.getItem('password')) || '';
-      const { data } = await runQuery(getQuery, token);
-      this.points = data.getPoints.data.map(({ _id, troop, points }) => ({
-        _id,
-        _troopId: troop._id,
-        points,
-        troop: troop.name,
-      }));
-      this.dbCopy = this.points.reduce(
-        (acc, { _id, _troopId, points }) => ({
-          [_id]: { points, _troopId },
-          ...acc,
-        }),
-        {}
-      );
+      try {
+        const token = parseToken(localStorage.getItem('password')) || '';
+        const { data } = await runQuery(getQuery, token);
+        this.points = data.getPoints.data.map(({ _id, troop, points }) => ({
+          _id,
+          _troopId: troop._id,
+          points,
+          troop: troop.name,
+        }));
+        this.dbCopy = this.points.reduce(
+          (acc, { _id, _troopId, points }) => ({
+            [_id]: { points, _troopId },
+            ...acc,
+          }),
+          {}
+        );
+      } catch (e) {
+        this.error();
+      }
     },
     async updatePoints(id, points) {
       const token = parseToken(localStorage.getItem('password')) || '';
